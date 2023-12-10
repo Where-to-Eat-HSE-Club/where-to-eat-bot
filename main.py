@@ -30,6 +30,7 @@ POST_NAME, PLACE_NAME, AUTHOR_NAME, BODY_TEXT, ADDRESS_ADD, CONFIRM, WAITING_FOR
 
 
 async def new_post(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    logger.info(f"{update.message.from_user.name} is creating a new post...")
     await update.message.reply_text(
         "Начинаю создавать пост. \n"
         "Отправьте /cancel чтобы отменить создание поста. \n\n"
@@ -146,7 +147,7 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     user = update.message.from_user
     logger.info("User %s canceled the conversation.", user.first_name)
     await update.message.reply_text(
-        "Отменил создание поста"
+        "Отменил создание поста."
     )
     clear_file()
 
@@ -220,15 +221,12 @@ def main() -> None:
             BODY_TEXT: [MessageHandler(filters.TEXT & (~filters.COMMAND), process_body_text)],
             ADDRESS_ADD: [MessageHandler(filters.TEXT & (~filters.COMMAND), process_address_add)],
             CONFIRM: [MessageHandler(filters.TEXT & (~filters.COMMAND), process_confirmation)],
-            WAITING_FOR_CONFIRM: [MessageHandler(filters.TEXT & (~filters.COMMAND), handle_confirmation)],
+            WAITING_FOR_CONFIRM: [CommandHandler("confirm", handle_confirmation)],
         },
         fallbacks=[CommandHandler("cancel", cancel)],
     )
 
     application.add_handler(conv_handler)
-
-    confirmation_handler = CommandHandler('confirm', handle_confirmation)
-    application.add_handler(confirmation_handler)
 
     start_handler = CommandHandler('start', start)
     application.add_handler(start_handler)
