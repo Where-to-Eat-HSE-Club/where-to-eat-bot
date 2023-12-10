@@ -203,6 +203,10 @@ async def send_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Чтобы начать создавать новый пост напишите /new_post и следуйте всем инструкциям.")
 
 
+async def send_get_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=update.message.from_user.id)
+
+
 def main() -> None:
     clear_file()
     application = Application.builder().token(TOKEN).build()
@@ -231,6 +235,9 @@ def main() -> None:
 
     help_handler = CommandHandler('help', send_help)
     application.add_handler(help_handler)
+
+    get_id_handler = CommandHandler('get_id', send_get_id)
+    application.add_handler(get_id_handler)
 
     unknown_handler = MessageHandler(filters.COMMAND, unknown)
     application.add_handler(unknown_handler)
