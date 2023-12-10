@@ -1,4 +1,6 @@
 import logging
+import sys
+
 from telegram import Update
 from telegram.ext import (
     Application,
@@ -9,7 +11,11 @@ from telegram.ext import (
     filters,
 )
 
-from config import TOKEN, DEV, LINE_SEPARATOR
+try:
+    from config import TOKEN, DEV, LINE_SEPARATOR
+except ModuleNotFoundError:
+    print("Config file config.py not found! Please create one and fill with TOKEN, DEV and LINE_SEPARATOR")
+    sys.exit(1)
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -158,10 +164,12 @@ def write_to_file(text: str):
 
 
 def get_admin_ids():
-    with open("admin_ids.txt", "r") as f:
-        ids = list(map(int, f.readline().strip().split()))
-    return ids
-
+    try:
+        with open("admin_ids.txt", "r") as f:
+            ids = list(map(int, f.readline().strip().split()))
+        return ids
+    except FileNotFoundError:
+        logger.error("File admin_ids.txt does not exist! Please create one and populate it with telegram admin ids")
 
 async def handle_confirmation(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
